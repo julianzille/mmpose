@@ -10,16 +10,16 @@ dataset_info = dict(
     keypoint_info={
         0:
         dict(
-            name='L_Eye', id=0, color=[0, 255, 0], type='upper', swap='R_Eye'),
+            name='L_Eye', id=0, color=[0, 0, 255], type='upper', swap='R_Eye'),
         1:
         dict(
             name='R_Eye',
             id=1,
-            color=[255, 128, 0],
+            color=[0, 0, 255],
             type='upper',
             swap='L_Eye'),
         2:
-        dict(name='Nose', id=2, color=[51, 153, 255], type='upper', swap=''),
+        dict(name='Nose', id=2, color=[0, 0, 255], type='upper', swap=''),
         3:
         dict(name='Neck', id=3, color=[51, 153, 255], type='upper', swap=''),
         4:
@@ -113,13 +113,13 @@ dataset_info = dict(
         dict(
             name='tail_tip',
             id=17,
-            color=[0,255,0],
+            color=[255,0,0],
             type='lower'),
         18:
         dict(
             name='tail_mid',
             id=18,
-            color=[230,230,250],
+            color=[255,0,0],
             type='lower'
         ),
         19:
@@ -159,7 +159,7 @@ dataset_info = dict(
             name='Spine',
             id=23,
             color=[0,255,255],
-            type='lower',
+            type='upper',
             swap='l_back_ankle'
         )
         

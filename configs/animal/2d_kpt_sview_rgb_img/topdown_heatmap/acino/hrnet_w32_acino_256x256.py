@@ -144,7 +144,8 @@ val_pipeline = [
             'flip_pairs'
         ]),
 ]
-
+gpu_ids=range(1)
+seed=0
 test_pipeline = val_pipeline
 work_dir='work_dirs/hrnet_w32_acino_256x256'
 data_root = 'data/acino'

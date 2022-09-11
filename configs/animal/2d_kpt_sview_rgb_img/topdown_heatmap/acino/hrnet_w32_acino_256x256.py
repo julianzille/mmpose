@@ -146,7 +146,7 @@ val_pipeline = [
 ]
 
 test_pipeline = val_pipeline
-
+work_dir='work_dirs/hrnet_w32_acino_256x256'
 data_root = 'data/acino'
 data = dict(
     samples_per_gpu=64,

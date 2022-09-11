@@ -14,7 +14,7 @@ from ...builder import DATASETS
 from ..base import Kpt2dSviewRgbImgTopDownDataset
 
 
-@DATASETS.register_module()
+@DATASETS.register_module(name='AnimalAcinoDataset')
 class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
     """Acino dataset for cheetah pose estimation.
 
@@ -52,7 +52,6 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         21: 'r_back_ankle',
         22: 'l_back_ankle',
         23: 'Spine',
-
 
     Args:
         ann_file (str): Path to the annotation file.

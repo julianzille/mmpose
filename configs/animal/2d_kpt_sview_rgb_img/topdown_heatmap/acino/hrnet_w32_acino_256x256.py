@@ -4,6 +4,8 @@ _base_ = [
 ]
 evaluation = dict(interval=10, metric='mAP', save_best='AP')
 
+dataset_type='AnimalAcinoDataset'
+
 optimizer = dict(
     type='Adam',
     lr=5e-4,

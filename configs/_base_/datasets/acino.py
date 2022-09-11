@@ -5,7 +5,7 @@ dataset_info = dict(
         title='AcinoSet: A 3D Pose Estimation Dataset and Baseline Models for Cheetahs in the Wild',
         container='2021 IEEE International Conference on Robotics and Automation',
         year='2022',
-        homepage='https://github.com/African-Robotics-Unit/AcinoSet',
+        homepage='https://github.com/African-Robotics-Unit/AcinoSet'
     ),
     keypoint_info={
         0:
@@ -156,10 +156,10 @@ dataset_info = dict(
             type='lower',
             swap='l_back_ankle'
         ),
-        22:
+        23:
         dict(
             name='tail_tip',
-            id=22,
+            id=23,
             color=[0,255,0],
             type='lower')
     },
@@ -171,30 +171,31 @@ dataset_info = dict(
         4: dict(link=('Neck', 'Spine'), id=4, color=[0, 255, 0]),
         5: dict(link=('Neck', 'L_Shoulder'), id=5, color=[0, 255, 255]),
         6: dict(link=('L_Shoulder', 'L_Elbow'), id=6, color=[0, 255, 255]),
-        7: dict(link=('L_Elbow', 'l_front_ankle'), id=6, color=[0, 255, 255]),
-        8: dict(link=('Neck', 'R_Shoulder'), id=7, color=[6, 156, 250]),
-        9: dict(link=('R_Shoulder', 'R_Elbow'), id=8, color=[6, 156, 250]),
-        10: dict(link=('R_Elbow', 'r_front_ankle'), id=9, color=[6, 156, 250]),
-        11: dict(link=('Root of tail', 'L_Hip'), id=10, color=[0, 255, 255]),
-        12: dict(link=('L_Hip', 'L_Knee'), id=11, color=[0, 255, 255]),
-        13: dict(link=('L_Knee', 'l_back_ankle'), id=12, color=[0, 255, 255]),
-        14: dict(link=('Root of tail', 'R_Hip'), id=13, color=[6, 156, 250]),
-        15: dict(link=('R_Hip', 'R_Knee'), id=14, color=[6, 156, 250]),
-        16: dict(link=('R_Knee', 'r_back_ankle'), id=15, color=[6, 156, 250]),
-        17: dict=(link=('Spine','Root of tail'),id=16,color=[0,255,0]),
-        18:dict(link=('r_front_ankle','R_F_Paw'),id=17,color=[6, 156, 250]),
-        19:dict(link=('l_front_ankle','L_F_Paw'),id=18,color=[0, 255, 255]),
-        20:dict(link=('l_back_ankle','L_B_Paw'),id=19,color=[0, 255, 255]),
-        21:dict(link=('r_back_ankle','R_B_Paw'),id=20,color=[6, 156, 250]),
-        22:dict(link=('Root of tail','R_F_Paw'),id=21,color=[6, 156, 250]),
-        23:dict(link=('tail_mid','tail_tip'),id=22,color=[255,0,0]),
-        24:dict(link=('Root of tail','tail_mid'),id=24,color=[255,0,0])
+        7: dict(link=('L_Elbow', 'l_front_ankle'), id=7, color=[0, 255, 255]),
+        8: dict(link=('Neck', 'R_Shoulder'), id=8, color=[6, 156, 250]),
+        9: dict(link=('R_Shoulder', 'R_Elbow'), id=9, color=[6, 156, 250]),
+        10: dict(link=('R_Elbow', 'r_front_ankle'), id=10, color=[6, 156, 250]),
+        11: dict(link=('Root of tail', 'L_Hip'), id=11, color=[0, 255, 255]),
+        12: dict(link=('L_Hip', 'L_Knee'), id=12, color=[0, 255, 255]),
+        13: dict(link=('L_Knee', 'l_back_ankle'), id=13, color=[0, 255, 255]),
+        14: dict(link=('Root of tail', 'R_Hip'), id=14, color=[6, 156, 250]),
+        15: dict(link=('R_Hip', 'R_Knee'), id=15, color=[6, 156, 250]),
+        16: dict(link=('R_Knee', 'r_back_ankle'), id=16, color=[6, 156, 250]),
+        17: dict(link=('Spine','Root of tail'), id=17, color=[0,255,0]),
+        18: dict(link=('r_front_ankle','R_F_Paw'),id=18,color=[6, 156, 250]),
+        19: dict(link=('l_front_ankle','L_F_Paw'),id=19,color=[0, 255, 255]),
+        20:dict(link=('l_back_ankle','L_B_Paw'),id=20,color=[0, 255, 255]),
+        21:dict(link=('r_back_ankle','R_B_Paw'),id=21,color=[6, 156, 250]),
+        22:dict(link=('tail_mid','tail_tip'),id=22,color=[255,0,0]),
+        23:dict(link=('Root of tail','tail_mid'),id=23,color=[255,0,0])
     },
     joint_weights=[
         1., 1., 1., 1., 1., 1., 1., 1.2, 1.2, 1.5, 1.5, 1., 1., 1.2, 1.2, 1.5,
-        1.5
+        1.5, 1.5, 1.5, 1.5, 1.5, 1.5,1.5,1.5
     ],
     sigmas=[
         0.025, 0.025, 0.026, 0.035, 0.035, 0.079, 0.072, 0.062, 0.079, 0.072,
-        0.062, 0.107, 0.087, 0.089, 0.107, 0.087, 0.089
-    ])
+        0.062, 0.107, 0.087, 0.089, 0.107, 0.087, 0.089, 0.087, 0.089, 0.062, 
+        0.079, 0.062, 0.079, 0.062
+    ] # https://github.com/cocodataset/cocoapi/issues/399
+)

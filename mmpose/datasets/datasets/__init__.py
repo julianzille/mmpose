@@ -3,7 +3,7 @@ from ...deprecated import (TopDownFreiHandDataset, TopDownOneHand10KDataset,
                            TopDownPanopticDataset)
 from .animal import (AnimalATRWDataset, AnimalFlyDataset, AnimalHorse10Dataset,
                      AnimalLocustDataset, AnimalMacaqueDataset,
-                     AnimalPoseDataset, AnimalZebraDataset)
+                     AnimalPoseDataset, AnimalZebraDataset,AnimalAcinoDataset)
 from .body3d import (Body3DH36MDataset, Body3DMviewDirectCampusDataset,
                      Body3DMviewDirectPanopticDataset,
                      Body3DMviewDirectShelfDataset)
@@ -45,5 +45,5 @@ __all__ = [
     'AnimalATRWDataset', 'AnimalPoseDataset', 'TopDownH36MDataset',
     'TopDownHalpeDataset', 'TopDownPoseTrack18VideoDataset',
     'Body3DMviewDirectPanopticDataset', 'Body3DMviewDirectShelfDataset',
-    'Body3DMviewDirectCampusDataset', 'NVGestureDataset'
+    'Body3DMviewDirectCampusDataset', 'NVGestureDataset','AnimalAcinoDataset'
 ]

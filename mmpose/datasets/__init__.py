@@ -5,7 +5,7 @@ from .pipelines import Compose
 from .samplers import DistributedSampler
 
 from .datasets import (  # isort:skip
-    AnimalATRWDataset, AnimalFlyDataset, AnimalHorse10Dataset,
+    AnimalAcinoDataset, AnimalATRWDataset, AnimalFlyDataset, AnimalHorse10Dataset,
     AnimalLocustDataset, AnimalMacaqueDataset, AnimalPoseDataset,
     AnimalZebraDataset, Body3DH36MDataset, BottomUpAicDataset,
     BottomUpCocoDataset, BottomUpCocoWholeBodyDataset,
@@ -24,7 +24,7 @@ from .datasets import (  # isort:skip
     Body3DMviewDirectCampusDataset, NVGestureDataset)
 
 __all__ = [
-    'TopDownCocoDataset', 'BottomUpCocoDataset', 'BottomUpMhpDataset',
+    'AnimalAcinoDataset', 'TopDownCocoDataset', 'BottomUpCocoDataset', 'BottomUpMhpDataset',
     'BottomUpAicDataset', 'BottomUpCocoWholeBodyDataset', 'TopDownMpiiDataset',
     'TopDownMpiiTrbDataset', 'OneHand10KDataset', 'PanopticDataset',
     'HandCocoWholeBodyDataset', 'FreiHandDataset', 'InterHand2DDataset',

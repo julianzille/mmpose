@@ -45,13 +45,13 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         14: 'R_Hip',
         15: 'R_Knee',
         16: 'R_B_Paw',
-        17: 'tail_mid',
-        18: 'r_front_ankle',
-        19: 'l_front_ankle',
-        20: 'r_back_ankle',
-        21: 'l_back_ankle',
-        22: 'Spine',
-        23: 'tail_tip'
+        17: 'tail_tip
+        18: 'tail_mid',
+        19: 'r_front_ankle',
+        20: 'l_front_ankle',
+        21: 'r_back_ankle',
+        22: 'l_back_ankle',
+        23: 'Spine',
 
 
     Args:

@@ -111,57 +111,58 @@ dataset_info = dict(
             swap='L_B_Paw'),
         17:
         dict(
-            name='tail_mid',
+            name='tail_tip',
             id=17,
+            color=[0,255,0],
+            type='lower'),
+        18:
+        dict(
+            name='tail_mid',
+            id=18,
             color=[230,230,250],
             type='lower'
         ),
-        18:
+        19:
         dict(
             name='r_front_ankle',
-            id=18,
+            id=19,
             color=[0,255,255],
             type='upper',
             swap='l_front_ankle'
         ),
-        19:
+        20:
         dict(
             name='l_front_ankle',
-            id=19,
+            id=20,
             color=[0,255,255],
             type='upper',
             swap='r_front_ankle'
         ),
-        20:
+        21:
         dict(
             name='r_back_ankle',
-            id=20,
+            id=21,
             color=[0,255,255],
             type='lower',
             swap='l_back_ankle'
         ),
-        21:
+        22:
         dict(
             name='l_back_ankle',
-            id=21,
+            id=22,
             color=[0,255,255],
             type='lower',
             swap='r_back_ankle'
         ),
-        22:
+        23:
         dict(
             name='Spine',
-            id=22,
+            id=23,
             color=[0,255,255],
             type='lower',
             swap='l_back_ankle'
-        ),
-        23:
-        dict(
-            name='tail_tip',
-            id=23,
-            color=[0,255,0],
-            type='lower')
+        )
+        
     },
     skeleton_info={
         0: dict(link=('L_Eye', 'R_Eye'), id=0, color=[0, 0, 255]),

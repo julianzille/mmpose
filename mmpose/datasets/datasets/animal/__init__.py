@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from .animal_acino_dataset import AnimalAcinoDataset
 from .animal_ap10k_dataset import AnimalAP10KDataset
 from .animal_atrw_dataset import AnimalATRWDataset
 from .animal_fly_dataset import AnimalFlyDataset
@@ -11,5 +12,5 @@ from .animal_zebra_dataset import AnimalZebraDataset
 __all__ = [
     'AnimalHorse10Dataset', 'AnimalMacaqueDataset', 'AnimalFlyDataset',
     'AnimalLocustDataset', 'AnimalZebraDataset', 'AnimalATRWDataset',
-    'AnimalPoseDataset', 'AnimalAP10KDataset'
+    'AnimalPoseDataset', 'AnimalAP10KDataset','AnimalAcinoDataset'
 ]

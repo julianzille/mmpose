@@ -160,7 +160,7 @@ dataset_info = dict(
             id=23,
             color=[0,255,255],
             type='upper',
-            swap='l_back_ankle'
+            swap=''
         )
         
     },

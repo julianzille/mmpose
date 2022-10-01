@@ -12,7 +12,7 @@ from xtcocotools.cocoeval import COCOeval
 from ....core.post_processing import oks_nms, soft_oks_nms
 from ...builder import DATASETS
 from ..base import Kpt2dSviewRgbImgTopDownDataset
-
+from torchvision import transforms
 
 @DATASETS.register_module(name='AnimalAcinoDataset')
 class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
@@ -28,13 +28,13 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
 
     Acino keypoint indexes::
 
-        0: 'L_Eye',
-        1: 'R_Eye',
-        2: 'Nose',
-        3: 'Neck',
-        4: 'root of tail',
-        5: 'L_Shoulder',
-        6: 'L_Elbow',
+        0: 'L_Eye', 1 
+        1: 'R_Eye', 2
+        2: 'Nose',3
+        3: 'Neck', 4
+        4: 'root of tail', 5
+        5: 'L_Shoulder', 6
+        6: 'L_Elbow', 
         7: 'L_F_Paw',
         8: 'R_Shoulder',
         9: 'R_Elbow',
@@ -70,7 +70,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
                  data_cfg,
                  pipeline,
                  dataset_info=None,
-                 test_mode=False):
+                 test_mode=False):##
 
         if dataset_info is None:
             warnings.warn(
@@ -100,7 +100,9 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
 
         self.ann_info['use_different_joint_weights'] = False
         self.db, self.id2Cat = self._get_db()
-
+        
+        # self.transform=transforms.Compose([transforms.ToTensor()])
+        
         print(f'=> num_images: {self.num_images}')
         print(f'=> load {len(self.db)} samples')
 
@@ -353,7 +355,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
     def _do_python_keypoint_eval(self, res_file):
         """Keypoint evaluation using COCOAPI."""
         coco_det = self.coco.loadRes(res_file)
-        coco_eval = COCOeval(self.coco, coco_det, 'keypoints', self.sigmas)
+        coco_eval = COCOeval(self.coco, coco_det, 'keypoints', self.sigmas, use_area=False)
         coco_eval.params.useSegm = None
         coco_eval.evaluate()
         coco_eval.accumulate()

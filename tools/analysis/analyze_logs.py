@@ -2,7 +2,7 @@
 import argparse
 import json
 from collections import defaultdict
-
+import pprint
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -30,7 +30,7 @@ def cal_train_time(log_dicts, args):
         print(f'average iter time: {np.mean(all_times):.4f} s/iter')
         print()
 
-
+#
 def plot_curve(log_dicts, args):
     if args.backend is not None:
         plt.switch_backend(args.backend)
@@ -44,26 +44,43 @@ def plot_curve(log_dicts, args):
                 legend.append(f'{json_log}_{metric}')
     assert len(legend) == (len(args.json_logs) * len(args.keys))
     metrics = args.keys
-
+    # print('Hello world')#
+    # print(len(log_dicts[0]))#
+    # print(len(log_dicts[0]))
+    # log_dicts[0]=log_dicts[0][0:90]
+    
+    # print(log_dicts)
     num_metrics = len(metrics)
+    # print(len(log_dicts[0]))
+    # pprint.pprint(log_dicts,compact=True)
     for i, log_dict in enumerate(log_dicts):
-        epochs = list(log_dict.keys())
-        for j, metric in enumerate(metrics):
-            print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
+        epochs = list(log_dict.keys()) # [1, 2, 3, ... , 100]
+        for j, metric in enumerate(metrics): # metric == acc_pose
+            
+            # print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
             if metric not in log_dict[epochs[0]]:
                 raise KeyError(
                     f'{args.json_logs[i]} does not contain metric {metric}')
             xs = []
             ys = []
-            num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1]
+            num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1] #83
+            
             for epoch in epochs:
                 iters = log_dict[epoch]['iter']
+                # print(len(iters))
                 if log_dict[epoch]['mode'][-1] == 'val':
                     iters = iters[:-1]
+                # print(len(iters))
                 xs.append(np.array(iters) + (epoch - 1) * num_iters_per_epoch)
                 ys.append(np.array(log_dict[epoch][metric][:len(iters)]))
+            
             xs = np.concatenate(xs)
             ys = np.concatenate(ys)
+            # print(xs)
+            # print()
+            # print(ys)
+            # print(xs.size) #17022
+            # print(len(ys)) #17012
             plt.xlabel('iter')
             plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=0.5)
             plt.legend()
@@ -128,6 +145,7 @@ def parse_args():
     add_plot_parser(subparsers)
     add_time_parser(subparsers)
     args = parser.parse_args()
+    
     return args
 
 

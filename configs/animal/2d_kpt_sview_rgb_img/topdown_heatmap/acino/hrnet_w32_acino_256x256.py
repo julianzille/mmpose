@@ -2,7 +2,12 @@ _base_ = [
     '../../../../_base_/default_runtime.py',
     '../../../../_base_/datasets/acino.py'
 ]
-evaluation = dict(interval=10, metric='mAP', save_best='AP')
+
+#Defaults:
+log_file=None
+total_epochs=1
+work_dir=''
+evaluation = dict(interval=10, metric='mAP', save_best='AP') 
 
 dataset_type='AnimalAcinoDataset'
 
@@ -10,7 +15,9 @@ optimizer = dict(
     type='Adam',
     lr=5e-4,
 )
+
 optimizer_config = dict(grad_clip=None)
+
 # learning policy
 lr_config = dict(
     policy='step',
@@ -18,13 +25,15 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[170, 200])
-total_epochs = 100
+
 log_config = dict(
     interval=1,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
     ])
+
+
 
 channel_cfg = dict(
     num_output_channels=24,
@@ -107,7 +116,7 @@ train_pipeline = [
     dict(type='TopDownRandomFlip', flip_prob=0.5),
     dict(
         type='TopDownHalfBodyTransform',
-        num_joints_half_body=8,
+        num_joints_half_body=12, #8
         prob_half_body=0.3),
     dict(
         type='TopDownGetRandomScaleRotation', rot_factor=40, scale_factor=0.5),
@@ -144,13 +153,12 @@ val_pipeline = [
             'flip_pairs'
         ]),
 ]
-gpu_ids=range(1)
-seed=0
+
 test_pipeline = val_pipeline
-work_dir='work_dirs/hrnet_w32_acino_256x256'
+
 data_root = 'data/acino'
 data = dict(
-    samples_per_gpu=64,
+    samples_per_gpu=64, # 
     workers_per_gpu=4,
     val_dataloader=dict(samples_per_gpu=32),
     test_dataloader=dict(samples_per_gpu=32),
@@ -167,12 +175,15 @@ data = dict(
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,
         pipeline=val_pipeline,
-        dataset_info={{_base_.dataset_info}}),
+        dataset_info={{_base_.dataset_info}},
+        test_mode=True),
+    
     test=dict(
         type='AnimalAcinoDataset',
         ann_file=f'{data_root}/annotations/acino_test.json',
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,
-        pipeline=val_pipeline,
-        dataset_info={{_base_.dataset_info}}),
+        pipeline=test_pipeline,
+        dataset_info={{_base_.dataset_info}},
+        test_mode=True)
 )

@@ -164,6 +164,7 @@ class TopDown(BasePose):
 
     def forward_test(self, img, img_metas, return_heatmap=False, **kwargs):
         """Defines the computation performed at every call when testing."""
+        
         assert img.size(0) == len(img_metas)
         batch_size, _, img_height, img_width = img.shape
         if batch_size > 1:

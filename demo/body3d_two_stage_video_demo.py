@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 import cv2
 import mmcv
 import numpy as np
-
+import mmpose
 from mmpose.apis import (collect_multi_frames, extract_pose_sequence,
                          get_track_id, inference_pose_lifter_model,
                          inference_top_down_pose_model, init_pose_model,
@@ -40,7 +40,7 @@ def convert_keypoint_definition(keypoints, pose_det_dataset,
         ndarray[K, 2 or 3]: the transformed 2D keypoints.
     """
     assert pose_lift_dataset in [
-        'Body3DH36MDataset', 'Body3DMpiInf3dhpDataset'
+        'Body3DH36MDataset', 'Body3DMpiInf3dhpDataset', 'Body3DAcinoDataset'
         ], '`pose_lift_dataset` should be `Body3DH36MDataset` ' \
         f'or `Body3DMpiInf3dhpDataset`, but got {pose_lift_dataset}.'
 
@@ -48,8 +48,8 @@ def convert_keypoint_definition(keypoints, pose_det_dataset,
         'TopDownCocoDataset', 'TopDownPoseTrack18Dataset',
         'TopDownPoseTrack18VideoDataset'
     ]
-    keypoints_new = np.zeros((17, keypoints.shape[1]), dtype=keypoints.dtype)
-    if pose_lift_dataset == 'Body3DH36MDataset':
+    keypoints_new = np.zeros((17, keypoints.shape[1]), dtype=keypoints.dtype) 
+    if pose_lift_dataset == 'Body3DH36MDataset' or pose_lift_dataset=='Body3DAcinoDataset':
         if pose_det_dataset in ['TopDownH36MDataset']:
             keypoints_new = keypoints
         elif pose_det_dataset in coco_style_datasets:
@@ -97,6 +97,10 @@ def convert_keypoint_definition(keypoints, pose_det_dataset,
 
             keypoints_new[[1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]] = \
                 keypoints[[7, 9, 11, 6, 8, 10, 0, 2, 4, 1, 3, 5]]
+        elif pose_det_dataset in ['AnimalAcinoDataset']:
+            # print("Animal2D kp -> Animal3D kp")
+            keypoints_new = np.zeros((20, keypoints.shape[1]), dtype=keypoints.dtype)
+            keypoints_new=keypoints[[23,1,2,3,4,5,6,8,9,11,12,14,15,17,18,19,20,21,22,0]]
         else:
             raise NotImplementedError(
                 f'unsupported conversion between {pose_lift_dataset} and '
@@ -424,6 +428,7 @@ def main():
         pose_lift_dataset_info = DatasetInfo(pose_lift_dataset_info)
 
     print('Running 2D-to-3D pose lifting inference...')
+    print(pose_lift_dataset_info.skeleton)
     for i, pose_det_results in enumerate(
             mmcv.track_iter_progress(pose_det_results_list)):
         # extract and pad input pose2d sequence
@@ -470,7 +475,8 @@ def main():
             res['bbox'] = det_res['bbox']
             res['track_id'] = instance_id
             pose_lift_results_vis.append(res)
-
+            # print(res)
+        print(pose_lift_results_vis)
         # Visualization
         if num_instances < 0:
             num_instances = len(pose_lift_results_vis)
@@ -480,11 +486,11 @@ def main():
             img=video[i],
             dataset=pose_lift_dataset,
             dataset_info=pose_lift_dataset_info,
-            out_file=None,
+            out_file=None,#'../demo_imgs',
             radius=args.radius,
             thickness=args.thickness,
             num_instances=num_instances,
-            show=args.show)
+            show=False)
 
         if save_out_video:
             if writer is None:
@@ -496,7 +502,7 @@ def main():
 
     if save_out_video:
         writer.release()
-
+    
 
 if __name__ == '__main__':
     main()

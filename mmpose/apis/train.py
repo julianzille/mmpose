@@ -77,8 +77,9 @@ def train_model(model,
         meta (dict | None): Meta dict to record some important information.
             Default: None
     """
-    logger = get_root_logger(cfg.log_level)
-
+    
+    logger=get_root_logger(cfg.log_file,cfg.log_level)
+    
     # prepare data loaders
     dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
     # step 1: give default values and override (if exist) from cfg.data
@@ -108,7 +109,7 @@ def train_model(model,
     train_loader_cfg = dict(loader_cfg, **cfg.data.get('train_dataloader', {}))
 
     data_loaders = [build_dataloader(ds, **train_loader_cfg) for ds in dataset]
-
+    # print(data_loaders)
     # determine whether use adversarial training precess or not
     use_adverserial_train = cfg.get('use_adversarial_train', False)
 

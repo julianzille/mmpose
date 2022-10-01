@@ -98,9 +98,14 @@ def convert_keypoint_definition(keypoints, pose_det_dataset,
             keypoints_new[[1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16]] = \
                 keypoints[[7, 9, 11, 6, 8, 10, 0, 2, 4, 1, 3, 5]]
         elif pose_det_dataset in ['AnimalAcinoDataset']:
-            # print("Animal2D kp -> Animal3D kp")
+            # Animal2D kp -> Animal3D kp
             keypoints_new = np.zeros((20, keypoints.shape[1]), dtype=keypoints.dtype)
-            keypoints_new=keypoints[[23,1,2,3,4,5,6,8,9,11,12,14,15,17,18,19,20,21,22,0]]
+            keypoints_new=keypoints[[2,1,0,3,
+                                    23,4,18,17,
+                                    8,9,19,
+                                    5,6,20,
+                                    14,15,21,
+                                    11,12,22]]                    
         else:
             raise NotImplementedError(
                 f'unsupported conversion between {pose_lift_dataset} and '

@@ -83,7 +83,7 @@ train_pipeline = [
         item=['input_2d', 'target'],
         flip_cfg=[
             dict(center_mode='static', center_x=0.),
-            dict(center_mode='root', center_index=4)
+            dict(center_mode='Spine', center_index=4)
         ],
         visible_item=['input_2d_visible', 'target_visible'],
         flip_prob=0.5),

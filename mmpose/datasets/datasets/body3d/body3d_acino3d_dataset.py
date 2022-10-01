@@ -24,23 +24,7 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
 
     Human3.6M keypoint indexes::
 
-        0: 'root (spine)',
-        1: 'right_hip',
-        2: 'right_knee',
-        3: 'right_foot',
-        4: 'left_hip',
-        5: 'left_knee',
-        6: 'left_foot',
-        7: 'spine',
-        8: 'thorax',
-        9: 'neck_base',
-        10: 'head',
-        11: 'left_shoulder',
-        12: 'left_elbow',
-        13: 'left_wrist',
-        14: 'right_shoulder',
-        15: 'right_elbow',
-        16: 'right_wrist'
+        0:
 
 
     Args:
@@ -55,10 +39,11 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
     """
 
     JOINT_NAMES = [
-        'Root', 'R_Eye', 'Nose', 'Neck', 'Root of tail',  'L_Eye',
-        'L_Hip','R_Hip','L_Shoulder','R_Shoulder','L_Knee','R_Knee','l_front_ankle', 'l_back_ankle','r_front_ankle','r_back_ankle',
-         'R_Elbow','L_Elbow','tail_tip','tail_mid'
-    ]
+        'Nose', 'R_Eye', 'L_Eye', 'Neck', 'Spine','tail_root', 'tail_mid','tail_tip', 
+        'R_Shoulder','R_Front_Knee','R_Front_Ankle',
+        'L_Shoulder','L_Front_Knee','L_Front_Ankle', 
+        'R_Hip','R_Back_Knee','R_Back_Ankle',
+        'L_Hip','L_Back_Knee','L_Back_Ankle']
 
     # 2D joint source options:
     # "gt": from the annotation file

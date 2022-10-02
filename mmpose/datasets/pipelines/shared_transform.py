@@ -167,6 +167,7 @@ class Collect:
 
         meta = {}
         if len(self.meta_keys) != 0:
+        
             for key in self.meta_keys:
                 if isinstance(key, tuple):
                     assert len(key) == 2

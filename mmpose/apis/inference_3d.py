@@ -459,7 +459,6 @@ def vis_3d_pose_result(model,
 
     if hasattr(model, 'module'):
         model = model.module
-
     img = model.show_result(
         result,
         img,
@@ -473,7 +472,6 @@ def vis_3d_pose_result(model,
         axis_azimuth=axis_azimuth,
         show=show,
         out_file=out_file)
-
     return img
 
 

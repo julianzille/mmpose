@@ -2,7 +2,7 @@ _base_ = [
     '../../../../_base_/default_runtime.py',
     '../../../../_base_/datasets/acino3d.py'
 ]
-evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe'], save_best='MPJPE')
+evaluation = dict(interval=20, metric=['mpjpe', 'p-mpjpe'], save_best='MPJPE')
 
 # optimizer settings
 optimizer = dict(
@@ -16,8 +16,6 @@ lr_config = dict(
     by_epoch=True,
     gamma=0.975,
 )
-
-total_epochs = 160
 
 log_config = dict(
     interval=20,
@@ -75,7 +73,7 @@ train_pipeline = [
         item='target',
         visible_item='target_visible',
         root_index=4,
-        root_name='Spine',
+        root_name='root_position',
         remove_root=False),
     dict(type='ImageCoordinateNormalization', item='input_2d'),
     dict(
@@ -83,7 +81,7 @@ train_pipeline = [
         item=['input_2d', 'target'],
         flip_cfg=[
             dict(center_mode='static', center_x=0.),
-            dict(center_mode='Spine', center_index=4)
+            dict(center_mode='root', center_index=4)
         ],
         visible_item=['input_2d_visible', 'target_visible'],
         flip_prob=0.5),
@@ -101,7 +99,7 @@ val_pipeline = [
         item='target',
         visible_item='target_visible',
         root_index=4,
-        root_name='Spine',
+        root_name='root_position',
         remove_root=False),
     dict(type='ImageCoordinateNormalization', item='input_2d'),
     dict(type='PoseSequenceToTensor', item='input_2d'),

@@ -44,6 +44,7 @@ model = dict(
         stem_channels=1024,
         num_blocks=2,
         kernel_sizes=(3, 3, 3),
+        causal=False,
         dropout=0.25,
         use_stride_conv=True),
     keypoint_head=dict(

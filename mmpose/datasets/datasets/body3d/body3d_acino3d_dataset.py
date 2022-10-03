@@ -24,7 +24,14 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
 
     Human3.6M keypoint indexes::
 
-        0:
+        0: Nose
+        1,2: R_Eye, L_Eye,
+        3,4,5: Neck, Spine (root), Tail root
+        6,7: Tail mid, tail tip
+        8,9,10: right front shoulder, knee, ankle
+        11,12,13: left front shoulder, knee, ankle
+        14,15,16: right back hip, knee, ankle
+        17,18,19: left back hip, knee, ankle
 
 
     Args:

@@ -48,7 +48,7 @@ class Kpt3dSviewKpt2dDataset(Dataset, metaclass=ABCMeta):
                  data_cfg,
                  pipeline,
                  dataset_info=None,
-                 test_mode=False):
+                 test_mode=False): 
 
         self.ann_file = ann_file
         self.img_prefix = img_prefix

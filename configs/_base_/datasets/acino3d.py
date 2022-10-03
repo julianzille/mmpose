@@ -12,11 +12,11 @@ dataset_info = dict(
 
     keypoint_info={
         0:
-            dict(name='Nose', id=0, color=[203,192,255], type='upper', swap=''),
+            dict(name='Nose', id=0, color=[0,0,255], type='upper', swap=''),
         1:
-            dict(name='R_Eye',id=1,color=[203,192,255],type='upper',swap='L_Eye'),
+            dict(name='R_Eye',id=1,color=[0,0,255],type='upper',swap='L_Eye'),
         2:
-            dict(name='L_Eye', id=2, color=[203,192,255], type='upper', swap='R_Eye'),
+            dict(name='L_Eye', id=2, color=[0,0,255], type='upper', swap='R_Eye'),
         3:
             dict(name='Neck', id=3, color=[51, 153, 255], type='upper', swap=''),
 
@@ -58,9 +58,9 @@ dataset_info = dict(
             dict(name='L_Back_Ankle',id=19,color=[0,205,255],type='lower',swap='R_Back_Ankle')    
     },
     skeleton_info={
-        0: dict(link=('L_Eye', 'R_Eye'), id=0, color=[71, 99, 255]),
-        1: dict(link=('L_Eye', 'Nose'), id=1, color=[71, 99, 255]),
-        2: dict(link=('R_Eye', 'Nose'), id=2, color=[71, 99, 255]),
+        0: dict(link=('L_Eye', 'R_Eye'), id=0, color=[0,0,255]),
+        1: dict(link=('L_Eye', 'Nose'), id=1, color=[0,0,255]),
+        2: dict(link=('R_Eye', 'Nose'), id=2, color=[0,0,255]),
         3: dict(link=('Nose', 'Neck'), id=3, color=[71, 99, 255]),
         4: dict(link=('Neck', 'root'), id=4, color=[50, 205, 50]),
         5: dict(link=('Neck', 'L_Shoulder'), id=5, color=[0, 255, 255]),

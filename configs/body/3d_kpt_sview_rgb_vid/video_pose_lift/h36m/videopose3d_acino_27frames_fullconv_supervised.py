@@ -2,7 +2,7 @@ _base_ = [
     '../../../../_base_/default_runtime.py',
     '../../../../_base_/datasets/acino3d.py'
 ]
-evaluation = dict(interval=20, metric=['mpjpe', 'p-mpjpe'], save_best='MPJPE')
+evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe'], save_best='MPJPE')
 
 # optimizer settings
 optimizer = dict(
@@ -10,11 +10,12 @@ optimizer = dict(
     lr=1e-3,
 )
 optimizer_config = dict(grad_clip=None)
+
 # learning policy
 lr_config = dict(
     policy='exp',
     by_epoch=True,
-    gamma=0.975,
+    gamma=0.995,
 )
 
 log_config = dict(

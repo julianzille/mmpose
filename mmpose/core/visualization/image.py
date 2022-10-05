@@ -261,7 +261,6 @@ def imshow_keypoints_3d(
             Where x_c, y_c is the mean value of x and y coordinates
         figsize: (float): figure size in inch.
     """
-
     show_img = img is not None
     if num_instances < 0:
         num_instances = len(pose_result)

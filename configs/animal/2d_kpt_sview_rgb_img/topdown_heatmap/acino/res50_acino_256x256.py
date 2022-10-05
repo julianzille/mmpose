@@ -5,8 +5,7 @@ _base_ = [
 
 #Defaults:
 log_file=None
-total_epochs=1
-work_dir=''
+work_dir=None
 evaluation = dict(interval=10, metric='mAP', save_best='AP') 
 
 dataset_type='AnimalAcinoDataset'
@@ -32,8 +31,6 @@ log_config = dict(
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
     ])
-
-
 
 channel_cfg = dict(
     num_output_channels=24,

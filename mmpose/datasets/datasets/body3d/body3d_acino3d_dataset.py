@@ -8,7 +8,7 @@ import mmcv
 import numpy as np
 from mmcv import Config, deprecated_api_warning
 
-from mmpose.core.evaluation import keypoint_mpjpe
+from mmpose.core.evaluation import (keypoint_mpjpe, keypoint_3d_pck)
 from mmpose.datasets.datasets.base import Kpt3dSviewKpt2dDataset
 from ...builder import DATASETS
 
@@ -59,7 +59,7 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
     SUPPORTED_JOINT_2D_SRC = {'gt', 'detection', 'pipeline'}
 
     # metric
-    ALLOWED_METRICS = {'mpjpe', 'p-mpjpe', 'n-mpjpe'}
+    ALLOWED_METRICS = {'mpjpe', 'p-mpjpe', 'n-mpjpe','3dpck'}
 
     def __init__(self,
                  ann_file,
@@ -256,6 +256,8 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
                 _nv_tuples = self._report_mpjpe(kpts, mode='p-mpjpe')
             elif _metric == 'n-mpjpe':
                 _nv_tuples = self._report_mpjpe(kpts, mode='n-mpjpe')
+            elif _metric == '3dpck':
+                _nv_tuples = self._report_3d_pck(kpts)
             else:
                 raise NotImplementedError
             name_value_tuples.extend(_nv_tuples)
@@ -324,6 +326,46 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
 
         return name_value_tuples
 
+    def _report_3d_pck(self, keypoint_results, mode='3dpck'):
+        """Cauculate Percentage of Correct Keypoints (3DPCK) w. or w/o
+        Procrustes alignment.
+        Args:
+            keypoint_results (list): Keypoint predictions. See
+                'Body3DMpiInf3dhpDataset.evaluate' for details.
+            mode (str): Specify mpjpe variants. Supported options are:
+                - ``'3dpck'``: Standard 3DPCK.
+                - ``'p-3dpck'``: 3DPCK after aligning prediction to groundtruth
+                    via a rigid transformation (scale, rotation and
+                    translation).
+        """
+
+        preds = []
+        gts = []
+        for idx, result in enumerate(keypoint_results):
+            pred = result['keypoints']
+            target_id = result['target_id']
+            gt, gt_visible = np.split(
+                self.data_info['joints_3d'][target_id], [3], axis=-1)
+            preds.append(pred)
+            gts.append(gt)
+
+        preds = np.stack(preds)
+        gts = np.stack(gts)
+        masks = np.ones_like(gts[:, :, 0], dtype=bool)
+
+        err_name = mode.upper()
+        if mode == '3dpck':
+            alignment = 'none'
+        elif mode == 'p-3dpck':
+            alignment = 'procrustes'
+        else:
+            raise ValueError(f'Invalid mode: {mode}')
+
+        error = keypoint_3d_pck(preds, gts, masks, alignment)
+        name_value_tuples = [(err_name, error)]
+
+        return name_value_tuples
+    
     def _load_camera_param(self, camera_param_file):
         """Load camera parameters from file."""
         return mmcv.load(camera_param_file)

@@ -2,12 +2,23 @@ _base_ = [
     '../../../../_base_/default_runtime.py',
     '../../../../_base_/datasets/acino3d.py'
 ]
-evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe'], save_best='MPJPE')
+
+
+
+total_epochs=400
+evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe','3dpck'], save_best='MPJPE')
+
+work_dir=''
+causal=False
+
+gpu_ids=range(1)
+workflow=[('train',1)]
+resume_from=None
 
 # optimizer settings
 optimizer = dict(
     type='Adam',
-    lr=1e-3,
+    lr=1e-4,
 )
 optimizer_config = dict(grad_clip=None)
 
@@ -15,7 +26,7 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='exp',
     by_epoch=True,
-    gamma=0.995,
+    gamma=0.998,
 )
 
 log_config = dict(
@@ -121,21 +132,21 @@ data = dict(
     test_dataloader=dict(samples_per_gpu=128),
     train=dict(
         type='Body3DAcinoDataset',
-        ann_file=f'{data_root}/annotations/acino3d_train.npz',
+        ann_file=f'{data_root}/annotations//acino3d_train.npz',
         img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
         pipeline=train_pipeline,
         dataset_info={{_base_.dataset_info}}),
     val=dict(
         type='Body3DAcinoDataset',
-        ann_file=f'{data_root}/annotations/acino3d_test.npz',
+        ann_file=f'{data_root}/annotations//acino3d_test.npz',
         img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
         pipeline=val_pipeline,
         dataset_info={{_base_.dataset_info}}),
     test=dict(
         type='Body3DAcinoDataset',
-        ann_file=f'{data_root}/annotations/acino3d_test.npz',
+        ann_file=f'{data_root}/annotations//acino3d_test.npz',
         img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
         pipeline=test_pipeline,

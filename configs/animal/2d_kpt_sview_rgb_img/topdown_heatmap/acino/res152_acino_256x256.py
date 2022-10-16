@@ -3,32 +3,30 @@ _base_ = [
     '../../../../_base_/datasets/acino.py'
 ]
 
-work_dir='work_dirs/res50_acino_256x256'
+work_dir='work_dirs/res152_acino_256x256'
+evaluation = dict(interval=5, metric='mAP', save_best='AP')
+checkpoint_config=dict(max_keep_ckpts=3)
 
 #Defaults:
 log_file=None
-resume_from=None
+log_name=None
+total_epochs=80
 gpu_ids=range(1)
 workflow=[('train',1)]
-evaluation = dict(interval=5, metric='mAP', save_best='AP')
-checkpoint_config=dict(max_keep_ckpts=2)
-total_epochs = 80
 dataset_type='AnimalAcinoDataset'
 
 optimizer = dict(
     type='Adam',
     lr=5e-4,
 )
-
 optimizer_config = dict(grad_clip=None)
-
 # learning policy
 lr_config = dict(
     policy='step',
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60, 70])
+    step=[60,70])
 
 log_config = dict(
     interval=5,
@@ -50,8 +48,8 @@ channel_cfg = dict(
 # model settings
 model = dict(
     type='TopDown',
-    pretrained='torchvision://resnet50',
-    backbone=dict(type='ResNet', depth=50),
+    pretrained='torchvision://resnet152',
+    backbone=dict(type='ResNet', depth=152),
     keypoint_head=dict(
         type='TopdownHeatmapSimpleHead',
         in_channels=2048,
@@ -87,7 +85,7 @@ train_pipeline = [
     dict(type='TopDownRandomFlip', flip_prob=0.5),
     dict(
         type='TopDownHalfBodyTransform',
-        num_joints_half_body=12, #8
+        num_joints_half_body=12,
         prob_half_body=0.3),
     dict(
         type='TopDownGetRandomScaleRotation', rot_factor=40, scale_factor=0.5),
@@ -129,7 +127,7 @@ test_pipeline = val_pipeline
 
 data_root = '../storage/acino'
 data = dict(
-    samples_per_gpu=64, # 
+    samples_per_gpu=32,
     workers_per_gpu=4,
     val_dataloader=dict(samples_per_gpu=32),
     test_dataloader=dict(samples_per_gpu=32),
@@ -147,9 +145,8 @@ data = dict(
         data_cfg=data_cfg,
         pipeline=val_pipeline,
         dataset_info={{_base_.dataset_info}}),
-    
     test=dict(
-        type='AnimalAcinoDataset',
+        type='AnimalPoseDataset',
         ann_file=f'{data_root}/annotations/acino_test.json',
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,

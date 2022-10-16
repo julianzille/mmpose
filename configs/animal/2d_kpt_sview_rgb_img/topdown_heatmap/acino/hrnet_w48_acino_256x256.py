@@ -3,25 +3,25 @@ _base_ = [
     '../../../../_base_/datasets/acino.py'
 ]
 
-work_dir='work_dirs/res50_acino_256x256'
+work_dir='work_dirs/hrnet_w48_acino_256x256'
 
 #Defaults:
 log_file=None
+log_name=None
+total_epochs=80
 resume_from=None
 gpu_ids=range(1)
 workflow=[('train',1)]
-evaluation = dict(interval=5, metric='mAP', save_best='AP')
-checkpoint_config=dict(max_keep_ckpts=2)
-total_epochs = 80
 dataset_type='AnimalAcinoDataset'
+
+evaluation = dict(interval=5, metric=['mAP'], save_best='AP')
+checkpoint_config=dict(max_keep_ckpts=3)
 
 optimizer = dict(
     type='Adam',
     lr=5e-4,
 )
-
 optimizer_config = dict(grad_clip=None)
-
 # learning policy
 lr_config = dict(
     policy='step',
@@ -50,12 +50,43 @@ channel_cfg = dict(
 # model settings
 model = dict(
     type='TopDown',
-    pretrained='torchvision://resnet50',
-    backbone=dict(type='ResNet', depth=50),
+    pretrained='https://download.openmmlab.com/mmpose/'
+    'pretrain_models/hrnet_w48-8ef0771d.pth',
+    backbone=dict(
+        type='HRNet',
+        in_channels=3,
+        extra=dict(
+            stage1=dict(
+                num_modules=1,
+                num_branches=1,
+                block='BOTTLENECK',
+                num_blocks=(4, ),
+                num_channels=(64, )),
+            stage2=dict(
+                num_modules=1,
+                num_branches=2,
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(48, 96)),
+            stage3=dict(
+                num_modules=4,
+                num_branches=3,
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(48, 96, 192)),
+            stage4=dict(
+                num_modules=3,
+                num_branches=4,
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(48, 96, 192, 384))),
+    ),
     keypoint_head=dict(
         type='TopdownHeatmapSimpleHead',
-        in_channels=2048,
+        in_channels=48,
         out_channels=channel_cfg['num_output_channels'],
+        num_deconv_layers=0,
+        extra=dict(final_conv_kernel=1, ),
         loss_keypoint=dict(type='JointsMSELoss', use_target_weight=True)),
     train_cfg=dict(),
     test_cfg=dict(
@@ -87,7 +118,7 @@ train_pipeline = [
     dict(type='TopDownRandomFlip', flip_prob=0.5),
     dict(
         type='TopDownHalfBodyTransform',
-        num_joints_half_body=12, #8
+        num_joints_half_body=8,
         prob_half_body=0.3),
     dict(
         type='TopDownGetRandomScaleRotation', rot_factor=40, scale_factor=0.5),
@@ -129,7 +160,7 @@ test_pipeline = val_pipeline
 
 data_root = '../storage/acino'
 data = dict(
-    samples_per_gpu=64, # 
+    samples_per_gpu=32,
     workers_per_gpu=4,
     val_dataloader=dict(samples_per_gpu=32),
     test_dataloader=dict(samples_per_gpu=32),
@@ -154,5 +185,5 @@ data = dict(
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,
         pipeline=test_pipeline,
-        dataset_info={{_base_.dataset_info}})
+        dataset_info={{_base_.dataset_info}}),
 )

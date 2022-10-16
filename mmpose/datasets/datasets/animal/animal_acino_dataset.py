@@ -39,8 +39,8 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         8: 'R_Shoulder',
         9: 'R_Elbow',
         10: 'R_F_Paw,
-        11: 'L_Hip',
-        12: 'L_Knee',
+        11: 'L_Hip',12
+        12: 'L_Knee',13
         13: 'L_B_Paw',
         14: 'R_Hip',
         15: 'R_Knee',

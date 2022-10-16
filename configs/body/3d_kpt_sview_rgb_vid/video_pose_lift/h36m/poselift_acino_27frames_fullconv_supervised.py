@@ -18,7 +18,7 @@ resume_from=None
 # optimizer settings
 optimizer = dict(
     type='Adam',
-    lr=1e-4,
+    lr=1e-3,
 )
 optimizer_config = dict(grad_clip=None)
 

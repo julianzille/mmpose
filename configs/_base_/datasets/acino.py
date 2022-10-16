@@ -193,12 +193,8 @@ dataset_info = dict(
         22:dict(link=('tail_mid','tail_tip'),id=22,color=[225,65,105]),
         23:dict(link=('Root of tail','tail_mid'),id=23,color=[225,65,105])
     },
-    joint_weights=[
-        1., 1., 1., 1., 1., 1., 1., 1.2, 1.2, 1.5, 1.5, 1., 1., 1.2, 1.2, 1.5,
-        1.5, 1.5, 1.5, 1.2, 1.2, 1.2,1.2,1.2
-    ],
-    sigmas=[
-    .26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07,
-    .87, .87, .89, .89, .35, .35, .79, .79, .72, .72, .62
-    ] # https://github.com/cocodataset/cocoapi/issues/399
+        
+    joint_weights=[1., 1., 1., 1., 1., 1., 1.2, 1.5, 1., 1.2, 1.5, 1., 
+                  1.2, 1.5, 1., 1.2, 1.5, 1.2, 1., 1.3, 1.3, 1.3, 1.3, 1.],
+    sigmas=[.04]*24 # https://github.com/cocodataset/cocoapi/issues/399
 )

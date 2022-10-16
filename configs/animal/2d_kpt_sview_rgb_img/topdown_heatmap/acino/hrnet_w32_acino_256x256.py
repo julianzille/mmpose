@@ -2,14 +2,19 @@ _base_ = [
     '../../../../_base_/default_runtime.py',
     '../../../../_base_/datasets/acino.py'
 ]
+work_dir='work_dirs/hrnet_w32_acino_256x256'
 
 #Defaults:
 log_file=None
-total_epochs=1
-work_dir=''
-evaluation = dict(interval=10, metric='mAP', save_best='AP') 
-
+log_name=None
+total_epochs=80
+resume_from=None
+gpu_ids=range(1)
+workflow=[('train',1)]
 dataset_type='AnimalAcinoDataset'
+
+evaluation = dict(interval=5, metric=['mAP'], save_best='AP') 
+checkpoint_config=dict(max_keep_ckpts=2)
 
 optimizer = dict(
     type='Adam',
@@ -24,15 +29,14 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[170, 200])
+    step=[60, 70])
 
 log_config = dict(
-    interval=1,
+    interval=5,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
     ])
-
 
 
 channel_cfg = dict(
@@ -156,7 +160,7 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = 'data/acino'
+data_root = '../storage/acino'
 data = dict(
     samples_per_gpu=64, # 
     workers_per_gpu=4,
@@ -175,8 +179,7 @@ data = dict(
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,
         pipeline=val_pipeline,
-        dataset_info={{_base_.dataset_info}},
-        test_mode=True),
+        dataset_info={{_base_.dataset_info}}),
     
     test=dict(
         type='AnimalAcinoDataset',
@@ -184,6 +187,5 @@ data = dict(
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,
         pipeline=test_pipeline,
-        dataset_info={{_base_.dataset_info}},
-        test_mode=True)
+        dataset_info={{_base_.dataset_info}}),
 )

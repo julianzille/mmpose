@@ -238,7 +238,8 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         else:
             tmp_folder = tempfile.TemporaryDirectory()
             res_file = osp.join(tmp_folder.name, 'result_keypoints.json')
-
+        
+        
         kpts = defaultdict(list)
 
         for result in results:

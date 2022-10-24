@@ -3,9 +3,9 @@ _base_ = [
     '../../../../_base_/datasets/acino3d.py'
 ]
 
+checkpoint_config=dict(max_keep_ckpts=2)
 
 
-total_epochs=400
 evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe','3dpck'], save_best='MPJPE')
 
 work_dir=''
@@ -18,7 +18,7 @@ resume_from=None
 # optimizer settings
 optimizer = dict(
     type='Adam',
-    lr=1e-3,
+    lr=9e-3,
 )
 optimizer_config = dict(grad_clip=None)
 
@@ -26,6 +26,9 @@ optimizer_config = dict(grad_clip=None)
 lr_config = dict(
     policy='exp',
     by_epoch=True,
+    warmup='linear',
+    warmup_iters=1000,
+    warmup_ratio=0.001,
     gamma=0.998,
 )
 

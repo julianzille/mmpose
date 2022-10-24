@@ -11,13 +11,13 @@ resume_from=None
 gpu_ids=range(1)
 workflow=[('train',1)]
 evaluation = dict(interval=5, metric='mAP', save_best='AP')
-checkpoint_config=dict(max_keep_ckpts=2)
-total_epochs = 80
+checkpoint_config=dict(max_keep_ckpts=1)
+total_epochs = 85
 dataset_type='AnimalAcinoDataset'
 
 optimizer = dict(
     type='Adam',
-    lr=5e-4,
+    lr=8.5e-4,
 )
 
 optimizer_config = dict(grad_clip=None)
@@ -28,7 +28,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60, 70])
+    step=[60, 70,80])
 
 log_config = dict(
     interval=5,
@@ -127,7 +127,7 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = '../storage/acino'
+data_root = 'data/acino'
 data = dict(
     samples_per_gpu=64, # 
     workers_per_gpu=4,

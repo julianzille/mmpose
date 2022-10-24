@@ -4,20 +4,20 @@ _base_ = [
 ]
 
 work_dir='work_dirs/res152_acino_256x256'
-evaluation = dict(interval=5, metric='mAP', save_best='AP')
-checkpoint_config=dict(max_keep_ckpts=3)
+evaluation = dict(interval=5, metric=['mAP'], save_best='AP')
+checkpoint_config=dict(max_keep_ckpts=1)
 
 #Defaults:
 log_file=None
 log_name=None
-total_epochs=80
+total_epochs=85
 gpu_ids=range(1)
 workflow=[('train',1)]
 dataset_type='AnimalAcinoDataset'
 
 optimizer = dict(
     type='Adam',
-    lr=5e-4,
+    lr=8.5e-4,
 )
 optimizer_config = dict(grad_clip=None)
 # learning policy
@@ -26,7 +26,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60,70])
+    step=[60,70,80])
 
 log_config = dict(
     interval=5,
@@ -125,7 +125,7 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = '../storage/acino'
+data_root = 'data/acino'
 data = dict(
     samples_per_gpu=32,
     workers_per_gpu=4,
@@ -146,7 +146,7 @@ data = dict(
         pipeline=val_pipeline,
         dataset_info={{_base_.dataset_info}}),
     test=dict(
-        type='AnimalPoseDataset',
+        type='AnimalAcinoDataset',
         ann_file=f'{data_root}/annotations/acino_test.json',
         img_prefix=f'{data_root}/data/',
         data_cfg=data_cfg,

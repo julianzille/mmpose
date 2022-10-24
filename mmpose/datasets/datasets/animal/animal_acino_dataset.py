@@ -228,6 +228,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         """
         metrics = metric if isinstance(metric, list) else [metric]
         allowed_metrics = ['mAP']
+        #
         for metric in metrics:
             if metric not in allowed_metrics:
                 raise KeyError(f'metric {metric} is not supported')
@@ -297,6 +298,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         # do evaluation only if the ground truth keypoint annotations exist
         if 'annotations' in self.coco.dataset:
             info_str = self._do_python_keypoint_eval(res_file)
+            
             name_value = OrderedDict(info_str)
 
             if tmp_folder is not None:

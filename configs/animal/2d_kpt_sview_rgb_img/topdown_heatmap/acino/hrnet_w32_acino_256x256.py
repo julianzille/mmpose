@@ -7,18 +7,18 @@ work_dir='work_dirs/hrnet_w32_acino_256x256'
 #Defaults:
 log_file=None
 log_name=None
-total_epochs=80
+total_epochs=85
 resume_from=None
 gpu_ids=range(1)
 workflow=[('train',1)]
 dataset_type='AnimalAcinoDataset'
 
 evaluation = dict(interval=5, metric=['mAP'], save_best='AP') 
-checkpoint_config=dict(max_keep_ckpts=2)
+checkpoint_config=dict(max_keep_ckpts=1)
 
 optimizer = dict(
     type='Adam',
-    lr=5e-4,
+    lr=8.5e-4,
 )
 
 optimizer_config = dict(grad_clip=None)
@@ -29,7 +29,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60, 70])
+    step=[60, 70,80])
 
 log_config = dict(
     interval=5,
@@ -160,7 +160,7 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = '../storage/acino'
+data_root = 'data/acino'
 data = dict(
     samples_per_gpu=64, # 
     workers_per_gpu=4,

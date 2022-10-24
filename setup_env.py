@@ -1,3 +1,8 @@
+## Most code/functions are extracted from Open-MMLab library:
+## https://github.com/open-mmlab
+## https://github.com/open-mmlab/mmdetection
+## https://github.com/open-mmlab/mmpose
+
 import mmcv
 from mmcv import Config, DictAction
 import mmpose
@@ -70,7 +75,8 @@ import json
 
 
 # Train from config file
-def train_2D_cfg(cfg,pretr=True):
+def train_2D_cfg(config,pretr=True):
+    cfg=Config.fromfile(config)
     if pretr==False:
         cfg.model['pretrained']=None
     elif pretr==True:
@@ -167,7 +173,8 @@ def train_2D_cfg(cfg,pretr=True):
         timestamp=timestamp,
         meta=meta)
 
-def test_pose_estimator(wrk_dir,cfg,pretr):
+def test_pose_estimator(wrk_dir,config,pretr):
+    cfg=Config.fromfile(config)
     if pretr==False:
         ckpt=wrk_dir+'/latest.pth'
         cfg.model.pretrained=None
@@ -224,7 +231,7 @@ def test_pose_estimator(wrk_dir,cfg,pretr):
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader)
-
+    # print(outputs)
     rank, _ = get_dist_info()
     eval_config = cfg.get('evaluation', {})
 
@@ -246,6 +253,19 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
     # print(cfg.data_cfg)
     # print(cfg.data)
     #Params:
+    
+    #data/acino_3d/2019_03_05/jules/run/cam2.mp4
+    # info=vid.split('/')
+    # date=info[2]
+    # cheetah=info[3]
+    # action=info[4]
+    # cam=info[5]
+    # cam_name=cam.split('.')[0]
+    # cam_id=date.replace('_','')+'0'+cam_name[-1]
+    # reconstr_params=mmcv.load(f'data/acino_3d/{date}/{cheetah}/{action}/fte_pw/reconstruction_params.json')
+    # start_frame=reconstr_params['start_frame']
+    # end_frame=reconstr_params['end_frame']
+    
     return_heatmap=False
     output_layer_names = None
     use_multi_frames=False
@@ -255,6 +275,12 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
     next_id = 0
     pose_results = []
     save_out_video=True
+    
+    kp3d=np.empty((0,4),float)
+    
+    smoother = Smoother(filter_cfg='configs/_base_/filters/one_euro.py',
+                        keypoint_key='keypoints',
+                        keypoint_dim=2)
     
     det_model = init_detector(det_cfg,det_ckpt)
     
@@ -269,16 +295,15 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
     poselift_dataset_info = DatasetInfo(poselift_dataset_info)
     
     video = mmcv.VideoReader(vid)
+    # length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    frames=len(video)
     
     print("\n2D Detection and Pose Estimation:")
     for frame_id, cur_frame in enumerate(mmcv.track_iter_progress(video)):
-
         pose_results_last = pose_results
-
         # get the detection results of current frame
         # the resulting box is (x1, y1, x2, y2)
         det_results = inference_detector(det_model, cur_frame)
-
         # keep the person class bounding boxes.
         det_results = process_mmdet_results(det_results, 1)
         
@@ -288,30 +313,34 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             det_results,
             format='xyxy',
             dataset=pose_dataset,
+            bbox_thr=0.9,
             dataset_info=pose_dataset_info,
             return_heatmap=return_heatmap,
             outputs=output_layer_names)
         
-        print("\n",pose_results,"\n")
         
-        pose_results, _ = get_track_id(
+        pose_results, next_id = get_track_id(
             pose_results,
             pose_results_last,
             next_id,
             use_oks=True,
-            tracking_thr=0.9,
+            use_one_euro=True,
+            tracking_thr=0.1,
             sigmas=pose_dataset_info.sigmas)
         
+        # pose_results = smoother.smooth(pose_results)
+        # print(next_id)
         pose_results_list.append(copy.deepcopy(pose_results))
     
     if save_out_video:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         fps = video.fps
         writer = None
-
+    
     # Re-arrange keypoints:
     for pose_results in pose_results_list:
         for res in pose_results:
+            # del res['track_id']
             keypoints = res['keypoints']
             keypoints_new = np.zeros((20, keypoints.shape[1]), dtype=keypoints.dtype)
             keypoints_new=keypoints[[2,1,0,3,
@@ -322,23 +351,31 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
                                     11,12,22]] 
             res['keypoints']=keypoints_new
     
-    # smoother=Smoother('configs/_base_/filters/one_euro.py',keypoint_key='keypoints',keypoint_dim=2)
     data_cfg = poselift_model.cfg.data_cfg
+    # print(pose_results_list)
+    
+    # print(np.shape(pose_results_list))
     
     print("\nPose Lifting:")
-    for i, pose_results in enumerate(mmcv.track_iter_progress(pose_results_list)): #Pose det results: iterate over each frame
+    #Pose det results: iterate over each frame
+    for i, pose_results in enumerate(mmcv.track_iter_progress(pose_results_list)): 
         # extract and pad input pose2d sequence
-        pose_results_2d = extract_pose_sequence( # returns 2D kp and BBox for 27 frames. len = 27
+        # returns 2D kp and BBox for 27 frames. len = 27
+        pose_results_2d = extract_pose_sequence( 
             pose_results_list,
             frame_idx=i,
             causal=data_cfg.causal,
             seq_len=data_cfg.seq_len,
             step=data_cfg.seq_frame_interval)
-
+        
+        # if i<15:
+        #     print(pose_results_2d)
+            
         # pose_results_2d = smoother.smooth(pose_results_2d)
 
         # 2D-to-3D pose lifting
-        poselift_results = inference_pose_lifter_model( #'keypoints': 2D keypoints for 27 frames, 'keypoints_3d': 3D keypoints for target frame
+        #'keypoints': 2D keypoints for 27 frames, 'keypoints_3d': 3D keypoints for target frame
+        poselift_results = inference_pose_lifter_model( 
             poselift_model,
             pose_results_2d=pose_results_2d,
             dataset=poselift_dataset,
@@ -346,16 +383,17 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             with_track_id=True,
             image_size=video.resolution,
             norm_pose_2d=False)
-        # print(pose_lift_results) #Norm = true
-
-
+        # if i==10:
+        #     print(poselift_results)
+        # print(len(poselift_results)) #Norm = true
+                
         poselift_results_vis = []
         for idx, res in enumerate(poselift_results):
             keypoints_3d = res['keypoints_3d']
             
             # exchange y,z-axis, and then reverse the direction of x,z-axis
             # keypoints_3d = keypoints_3d[..., [0, 2, 1]]
-            # keypoints_3d[..., 0] = -keypoints_3d[..., 0]
+            keypoints_3d[..., 0] = -keypoints_3d[..., 0]
             # keypoints_3d[..., 2] = -keypoints_3d[..., 2]
             # rebase height (z-axis)
             
@@ -374,31 +412,39 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             res['track_id'] = instance_id
             poselift_results_vis.append(res)
 
-        # print(len(poselift_results_vis))
+        if len(poselift_results)==0:
+            # print(poselift_results)
+            kp3d=np.append(kp3d,np.zeros((20,4)),axis=0)
+        else:    
+            kp3d=np.append(kp3d,poselift_results_vis[0]['keypoints_3d'],axis=0)
+        
         # Visualization
-
-        # if len(poselift_results_vis)==1:
-# 
         if num_instances < 0:
             num_instances = len(poselift_results_vis)
-
+        
         img_vis = vis_3d_pose_result(
             poselift_model,
             result=poselift_results_vis,
-            img=video[i],
+            img=video[i],#i
             dataset=poselift_dataset,
             dataset_info=poselift_dataset_info,
             out_file=None,
             num_instances=num_instances,
             show=False)
-
+        
+        # print(poselift_results_vis[0])
+        
         if save_out_video:
             if writer is None:
-                writer = cv2.VideoWriter(f'{cfg.work_dir}/{os.path.basename(vid).split(".")[0]}_out.mp4', fourcc, fps, (img_vis.shape[1], img_vis.shape[0]))
-            writer.write(img_vis)
-
+                writer = cv2.VideoWriter(os.path.join('vis_results',
+                         f'lift_{os.path.basename(vid)}'), fourcc, fps, (img_vis.shape[1], img_vis.shape[0]))
+            writer.write(img_vis) 
+            
+        
     if save_out_video:
         writer.release()
+    kp3d=kp3d.reshape(frames,20,4)
+    return kp3d
         
 def add_cameras(n,calib_file,cameras_dict):
     calib_dict=mmcv.load(calib_file)
@@ -527,7 +573,7 @@ def generate_stats(kp2darr,kp3darr,dirr):
             pickle.dump(stat_dict, f)
         print(f'Create statistic data file: {out_file}')
 
-def get_anns(cam_id, cheetah, action, cam, date, start_frame, end_frame, pose_model,det_model,smoother):
+def get_anns(cam_id, cheetah, action, cam, date, start_frame, end_frame, pose_model,pose_dataset,pose_dataset_info,det_model,smoother):
     ''' Calculate centers, scales and estimate 2D keypoints using top-down pose-estimator (pose-detect + '''
     
     #DLC 2D Anns:
@@ -567,8 +613,6 @@ def get_anns(cam_id, cheetah, action, cam, date, start_frame, end_frame, pose_mo
                 return_heatmap=False,
                 outputs=None)
             
-            
-            
             pose_results, next_id = get_track_id(
                     pose_results,
                     pose_results_last,
@@ -578,8 +622,8 @@ def get_anns(cam_id, cheetah, action, cam, date, start_frame, end_frame, pose_mo
                     sigmas=pose_dataset_info.sigmas)
             
             pose_results = smoother.smooth(pose_results)
-            if frame_id==10:
-                print(returned_outputs)
+            # if frame_id==10:
+            #     print(returned_outputs)
             assert pose_results != []
                           
             bboxes_res=np.append(bboxes_res,pose_results[0]['bbox'][:4])
@@ -635,8 +679,8 @@ def load_pickle(pickle_file):
 
     return(data)
 
-def setup_lifter_config(cfg,eps,anns2d,causal):
-    
+def train_test_lifter(config,eps,anns2d,causal,frames):
+    cfg=Config.fromfile(config)
     cfg.total_epochs=eps
     
     cfg.data['train']['ann_file']=f'data/acino_3d/annotations/{anns2d}/acino3d_train.npz'
@@ -649,7 +693,7 @@ def setup_lifter_config(cfg,eps,anns2d,causal):
         caus='noncausal'
     
     cfg.model['backbone']['causal']=causal
-    cfg.work_dir=f'work_dirs/acino_poselift_{anns2d}_{caus}_supervised'
+    cfg.work_dir=f'work_dirs/acino_poselift_{anns2d}_{caus}_{frames}frames'
 
     cfg.log_name = time.strftime('%d-%m-', time.localtime())+"ep"+str(cfg.total_epochs)
     cfg.log_file = os.path.join(cfg.work_dir, f'{cfg.log_name}.log')
@@ -662,9 +706,10 @@ def setup_lifter_config(cfg,eps,anns2d,causal):
     set_random_seed(seed, deterministic=False)
     cfg.seed = seed
     
-    return cfg
+    train_lifter(cfg)
+    test_poselifter(cfg,f'{cfg.work_dir}/latest.pth')
     
-def train_lifter_cfg(cfg):
+def train_lifter(cfg):
     # set multi-process settings
     setup_multi_processes(cfg)
     # init the logger before other steps
@@ -706,9 +751,11 @@ def train_lifter_cfg(cfg):
         timestamp=timestamp,
         meta=meta)
     
-def test_poselifter(config,ckpt):
     
-    cfg=Config.fromfile(config)
+    
+def test_poselifter(cfg,ckpt):
+    
+    # cfg=Config.fromfile(config)
     
     distributed = False
     fuse_convbn=True
@@ -765,6 +812,7 @@ def test_poselifter(config,ckpt):
         mmcv.dump(outputs, f'{cfg.work_dir}/test_results.json')
 
         results = dataset.evaluate(outputs, cfg.work_dir, **eval_config)
+        # print(results)
         for k, v in sorted(results.items()):
             print(f'{k}: {v}')
             
@@ -810,8 +858,7 @@ def topdown_mmtrack(det_config,det_checkpoint,pose_config,pose_checkpoint,vid):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         videoWriter = cv2.VideoWriter(
             os.path.join('vis_results',
-                         f'vis_{os.path.basename(vid)}'), fourcc,
-            fps, size)
+                         f'track_{os.path.basename(vid)}'), fourcc,fps, size)
 
     # frame index offsets for inference, used in multi-frame inference setting
     if use_multi_frames:
@@ -865,9 +912,9 @@ def topdown_mmtrack(det_config,det_checkpoint,pose_config,pose_checkpoint,vid):
             format='xyxy',
             dataset=dataset,
             dataset_info=dataset_info,
-            return_heatmap=return_heatmap,
+            return_heatmap=True,
             outputs=output_layer_names)
-
+        
         # get track id for each person instance
         pose_results, next_id = get_track_id(
             pose_results,
@@ -880,7 +927,9 @@ def topdown_mmtrack(det_config,det_checkpoint,pose_config,pose_checkpoint,vid):
         # post-process the pose results with smoother
 
         pose_results = smoother.smooth(pose_results)
-
+        if frame_id==10:
+            print(frame_id)
+        # print(returned_outputs)
         # show the results
         vis_frame = vis_pose_result(
             pose_model,

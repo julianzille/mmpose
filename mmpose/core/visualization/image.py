@@ -220,7 +220,7 @@ def imshow_keypoints_3d(
     kpt_score_thr=0.3,
     num_instances=-1,
     *,
-    axis_azimuth=70,
+    axis_azimuth=45,
     axis_limit=1.7,
     axis_dist=10.0,
     axis_elev=15.0,
@@ -269,7 +269,8 @@ def imshow_keypoints_3d(
             pose_result = pose_result[:num_instances]
         elif len(pose_result) < num_instances:
             pose_result += [dict()] * (num_instances - len(pose_result))
-    num_axis = num_instances + 1 if show_img else num_instances
+            
+    num_axis = len(pose_result)#num_instances + 1 if show_img else num_instances
 
     plt.ioff()
     fig = plt.figure(figsize=(vis_height * num_axis * 0.01, vis_height * 0.01))
@@ -285,7 +286,7 @@ def imshow_keypoints_3d(
         ax_img.set_axis_off()
         ax_img.set_title('Input')
         ax_img.imshow(img, aspect='equal')
-
+    
     for idx, res in enumerate(pose_result):
         dummy = len(res) == 0
         kpts = np.zeros((1, 3)) if dummy else res['keypoints_3d']
@@ -294,7 +295,7 @@ def imshow_keypoints_3d(
         valid = kpts[:, 3] >= kpt_score_thr
 
         ax_idx = idx + 2 if show_img else idx + 1
-        ax = fig.add_subplot(1, num_axis, ax_idx, projection='3d')
+        ax = fig.add_subplot(2, num_axis, ax_idx, projection='3d')
         ax.view_init(
             elev=axis_elev,
             azim=axis_azimuth,

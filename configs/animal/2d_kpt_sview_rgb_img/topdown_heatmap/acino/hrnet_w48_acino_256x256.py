@@ -158,7 +158,7 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = 'dataacino'
+data_root = 'data/acino'
 data = dict(
     samples_per_gpu=32,
     workers_per_gpu=4,

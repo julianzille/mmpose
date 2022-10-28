@@ -227,7 +227,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
             dict: Evaluation results for evaluation metric.
         """
         metrics = metric if isinstance(metric, list) else [metric]
-        allowed_metrics = ['mAP']
+        allowed_metrics = ['mAP','PCK']
         #
         for metric in metrics:
             if metric not in allowed_metrics:
@@ -242,7 +242,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         
         
         kpts = defaultdict(list)
-
+        kpts2=[]
         for result in results:
             preds = result['preds']
             boxes = result['boxes']
@@ -263,8 +263,11 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
                     'bbox_id': bbox_ids[i],
                     'category': cat
                 })
+                
+            
+                
         kpts = self._sort_and_unique_bboxes(kpts)
-
+        
         # rescoring and oks nms
         num_joints = self.ann_info['num_joints']
         vis_thr = self.vis_thr

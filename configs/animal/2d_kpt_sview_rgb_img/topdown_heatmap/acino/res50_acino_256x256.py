@@ -10,7 +10,7 @@ log_file=None
 resume_from=None
 gpu_ids=range(1)
 workflow=[('train',1)]
-evaluation = dict(interval=5, metric='mAP', save_best='AP')
+evaluation = dict(interval=5, metric=['mAP'], save_best='AP')
 checkpoint_config=dict(max_keep_ckpts=1)
 total_epochs = 85
 dataset_type='AnimalAcinoDataset'

@@ -238,6 +238,7 @@ def test_pose_estimator(wrk_dir,config,pretr):
     results = dataset.evaluate(outputs, cfg.work_dir, **eval_config)
     for k, v in sorted(results.items()):
         print(f'{k}: {v}')
+        
     
 def load_pickle(pickle_file):
     """
@@ -679,7 +680,7 @@ def load_pickle(pickle_file):
 
     return(data)
 
-def train_test_lifter(config,eps,anns2d,causal,frames):
+def train_test_lifter(config,eps,anns2d,causal,frames,train=False,test=True):
     cfg=Config.fromfile(config)
     cfg.total_epochs=eps
     
@@ -706,8 +707,10 @@ def train_test_lifter(config,eps,anns2d,causal,frames):
     set_random_seed(seed, deterministic=False)
     cfg.seed = seed
     
-    train_lifter(cfg)
-    test_poselifter(cfg,f'{cfg.work_dir}/latest.pth')
+    if train:
+        train_lifter(cfg)
+    if test:
+        test_poselifter(cfg,f'{cfg.work_dir}/latest.pth')
     
 def train_lifter(cfg):
     # set multi-process settings

@@ -8,7 +8,7 @@ work_dir='work_dirs/hrnet_w48_acino_256x256'
 #Defaults:
 log_file=None
 log_name=None
-total_epochs=85
+total_epochs=70
 resume_from=None
 gpu_ids=range(1)
 workflow=[('train',1)]
@@ -25,10 +25,11 @@ optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
     policy='step',
+    gamma=0.5,
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60, 70,80])
+    step=[45, 55,60,65])
 
 log_config = dict(
     interval=5,

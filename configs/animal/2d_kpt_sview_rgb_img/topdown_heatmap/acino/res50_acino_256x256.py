@@ -12,7 +12,7 @@ gpu_ids=range(1)
 workflow=[('train',1)]
 evaluation = dict(interval=5, metric=['mAP'], save_best='AP')
 checkpoint_config=dict(max_keep_ckpts=1)
-total_epochs = 85
+total_epochs = 70
 dataset_type='AnimalAcinoDataset'
 
 optimizer = dict(
@@ -25,10 +25,11 @@ optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(
     policy='step',
+    gamma=0.5,
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[60, 70,80])
+    step=[45, 55,60,65])
 
 log_config = dict(
     interval=5,

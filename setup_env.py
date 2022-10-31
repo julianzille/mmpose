@@ -250,23 +250,7 @@ def load_pickle(pickle_file):
     return(data)
 
 def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_ckpt,vid):
-    # print(cfg.model)
-    # print(cfg.data_cfg)
-    # print(cfg.data)
-    #Params:
-    
-    #data/acino_3d/2019_03_05/jules/run/cam2.mp4
-    # info=vid.split('/')
-    # date=info[2]
-    # cheetah=info[3]
-    # action=info[4]
-    # cam=info[5]
-    # cam_name=cam.split('.')[0]
-    # cam_id=date.replace('_','')+'0'+cam_name[-1]
-    # reconstr_params=mmcv.load(f'data/acino_3d/{date}/{cheetah}/{action}/fte_pw/reconstruction_params.json')
-    # start_frame=reconstr_params['start_frame']
-    # end_frame=reconstr_params['end_frame']
-    
+       
     return_heatmap=False
     output_layer_names = None
     use_multi_frames=False
@@ -954,3 +938,29 @@ def topdown_mmtrack(det_config,det_checkpoint,pose_config,pose_checkpoint,vid):
 
     if save_out_video:
         videoWriter.release()
+        
+def bb_intersection_over_union(boxA, boxB):
+    ##obtained from https://gist.github.com/meyerjo/dd3533edc97c81258898f60d8978eddc
+    
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+
+    # compute the area of intersection rectangle
+    interArea = abs(max((xB - xA, 0)) * max((yB - yA), 0))
+    if interArea == 0:
+        return 0
+    # compute the area of both the prediction and ground-truth
+    # rectangles
+    boxAArea = abs((boxA[2] - boxA[0]) * (boxA[3] - boxA[1]))
+    boxBArea = abs((boxB[2] - boxB[0]) * (boxB[3] - boxB[1]))
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+
+    # return the intersection over union value
+    return iou

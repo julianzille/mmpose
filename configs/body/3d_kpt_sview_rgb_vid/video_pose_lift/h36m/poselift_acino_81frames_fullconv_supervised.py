@@ -6,7 +6,7 @@ _base_ = [
 checkpoint_config=dict(max_keep_ckpts=1)
 
 
-evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe','3dpck'], save_best='MPJPE')
+evaluation = dict(interval=10, metric=['mpjpe', 'p-mpjpe','n-mpjpe','3dpck'], save_best='MPJPE')
 
 work_dir=''
 causal=False

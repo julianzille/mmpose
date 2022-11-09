@@ -273,6 +273,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         vis_thr = self.vis_thr
         oks_thr = self.oks_thr
         valid_kpts = []
+        # okss=[]
         for image_id in kpts.keys():
             img_kpts = kpts[image_id]
             for n_p in img_kpts:
@@ -290,8 +291,9 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
                 n_p['score'] = kpt_score * box_score
 
             if self.use_nms:
-                nms = soft_oks_nms if self.soft_nms else oks_nms
+                nms= soft_oks_nms if self.soft_nms else oks_nms
                 keep = nms(list(img_kpts), oks_thr, sigmas=self.sigmas)
+                # okss.append(oks)
                 valid_kpts.append([img_kpts[_keep] for _keep in keep])
             else:
                 valid_kpts.append(img_kpts)
@@ -366,7 +368,7 @@ class AnimalAcinoDataset(Kpt2dSviewRgbImgTopDownDataset):
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
-
+        
         stats_names = [
             'AP', 'AP .5', 'AP .75', 'AP (M)', 'AP (L)', 'AR', 'AR .5',
             'AR .75', 'AR (M)', 'AR (L)'

@@ -251,11 +251,11 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
         name_value_tuples = []
         for _metric in metrics:
             if _metric == 'mpjpe':
-                _nv_tuples = self._report_mpjpe(kpts)
+                _nv_tuples, errors_nm = self._report_mpjpe(kpts)
             elif _metric == 'p-mpjpe':
-                _nv_tuples = self._report_mpjpe(kpts, mode='p-mpjpe')
+                _nv_tuples, ersp = self._report_mpjpe(kpts, mode='p-mpjpe')
             elif _metric == 'n-mpjpe':
-                _nv_tuples = self._report_mpjpe(kpts, mode='n-mpjpe')
+                _nv_tuples, ersn = self._report_mpjpe(kpts, mode='n-mpjpe')
             elif _metric == '3dpck':
                 _nv_tuples = self._report_3d_pck(kpts)
             else:
@@ -265,7 +265,7 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
         if tmp_folder is not None:
             tmp_folder.cleanup()
 
-        return OrderedDict(name_value_tuples)
+        return OrderedDict(name_value_tuples),errors_nm,ersn,ersp
 
     def _report_mpjpe(self, keypoint_results, mode='mpjpe'):
         """Cauculate mean per joint position error (MPJPE) or its variants like
@@ -316,7 +316,7 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
         else:
             raise ValueError(f'Invalid mode: {mode}')
 
-        error = keypoint_mpjpe(preds, gts, masks, alignment)
+        error,err1 = keypoint_mpjpe(preds, gts, masks, alignment)
         name_value_tuples = [(err_name, error)]
 
         for action_category, indices in action_category_indices.items():
@@ -324,7 +324,7 @@ class Body3DAcinoDataset(Kpt3dSviewKpt2dDataset):
                                     masks[indices])
             name_value_tuples.append((f'{err_name}_{action_category}', _error))
 
-        return name_value_tuples
+        return name_value_tuples,err1
 
     def _report_3d_pck(self, keypoint_results, mode='3dpck'):
         """Cauculate Percentage of Correct Keypoints (3DPCK) w. or w/o

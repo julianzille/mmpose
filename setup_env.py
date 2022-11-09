@@ -238,7 +238,8 @@ def test_pose_estimator(wrk_dir,config,pretr):
     results = dataset.evaluate(outputs, cfg.work_dir, **eval_config)
     for k, v in sorted(results.items()):
         print(f'{k}: {v}')
-        
+
+
     
 def load_pickle(pickle_file):
     """
@@ -282,7 +283,8 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
     video = mmcv.VideoReader(vid)
     # length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     frames=len(video)
-    
+    vid_name=osp.basename(vid).split('.')
+    vid_name=vid_name[0]
     print("\n2D Detection and Pose Estimation:")
     for frame_id, cur_frame in enumerate(mmcv.track_iter_progress(video)):
         pose_results_last = pose_results
@@ -313,6 +315,27 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             tracking_thr=0.1,
             sigmas=pose_dataset_info.sigmas)
         
+#         new=pose_results
+#         if frame_id==30:
+#             print(new)
+#             keypoints = new[0]['keypoints']
+#             keypoints_new = np.zeros((20, keypoints.shape[1]), dtype=keypoints.dtype)
+#             keypoints_new=keypoints[[2,1,0,3,
+#                                     23,4,18,17,
+#                                     8,9,19,
+#                                     5,6,20,
+#                                     14,15,21,
+#                                     11,12,22]] 
+#             new[0]['keypoints']=keypoints_new
+        
+#             vis_pose_result(
+#                 pose_model,
+#                 cur_frame,
+#                 new,
+#                 dataset=poselift_dataset,
+#                 dataset_info=poselift_dataset_info,
+#                 out_file=f'{vid_name}.jpg')
+        
         # pose_results = smoother.smooth(pose_results)
         # print(next_id)
         pose_results_list.append(copy.deepcopy(pose_results))
@@ -340,6 +363,11 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
     # print(pose_results_list)
     
     # print(np.shape(pose_results_list))
+    
+    
+    
+    
+    
     
     print("\nPose Lifting:")
     #Pose det results: iterate over each frame
@@ -389,7 +417,7 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             # add title
             det_res = pose_results[idx]
             instance_id = det_res['track_id']
-            res['title'] = f'Prediction ({instance_id})'
+            res['title'] = f''#Prediction ({osp.basename(vid)})'
             
             # only visualize the target frame
             res['keypoints'] = det_res['keypoints']
@@ -407,6 +435,15 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
         if num_instances < 0:
             num_instances = len(poselift_results_vis)
         
+        # if i==170:
+        #     out_file=='please.jpg'
+        # else:
+        #     out_file=None
+        if i==170:
+            
+            mmcv.image.imwrite(video[i],f'{vid_name}.jpg')
+            print('done\n')
+      
         img_vis = vis_3d_pose_result(
             poselift_model,
             result=poselift_results_vis,
@@ -417,6 +454,7 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
             num_instances=num_instances,
             show=False)
         
+            
         # print(poselift_results_vis[0])
         
         if save_out_video:
@@ -425,7 +463,7 @@ def demo_pose_lifter(det_cfg,det_ckpt,pose_cfg,pose_ckpt,poselift_cfg,poselift_c
                          f'lift_{os.path.basename(vid)}'), fourcc, fps, (img_vis.shape[1], img_vis.shape[0]))
             writer.write(img_vis) 
             
-        
+            
     if save_out_video:
         writer.release()
     kp3d=kp3d.reshape(frames,20,4)
@@ -694,7 +732,8 @@ def train_test_lifter(config,eps,anns2d,causal,frames,train=False,test=True):
     if train:
         train_lifter(cfg)
     if test:
-        test_poselifter(cfg,f'{cfg.work_dir}/latest.pth')
+        ers,ersn,ersp=test_poselifter(cfg,f'{cfg.work_dir}/latest.pth')
+    return ers,ersn,ersp
     
 def train_lifter(cfg):
     # set multi-process settings
@@ -798,10 +837,13 @@ def test_poselifter(cfg,ckpt):
         print(f'\nwriting results to {cfg.work_dir}/test_results.json')
         mmcv.dump(outputs, f'{cfg.work_dir}/test_results.json')
 
-        results = dataset.evaluate(outputs, cfg.work_dir, **eval_config)
+        results,error_nm,errornorm,errorp = dataset.evaluate(outputs, cfg.work_dir, **eval_config)
         # print(results)
         for k, v in sorted(results.items()):
             print(f'{k}: {v}')
+    return np.reshape(error_nm,(len(error_nm)//20,20)),np.reshape(errornorm,(len(errornorm)//20,20)),np.reshape(errorp,(len(errorp)//20,20))
+            
+           
             
 def topdown_mmtrack(det_config,det_checkpoint,pose_config,pose_checkpoint,vid):
     save_out_video = True
@@ -964,3 +1006,47 @@ def bb_intersection_over_union(boxA, boxB):
 
     # return the intersection over union value
     return iou
+
+
+def top_down_img_demo(imgname, kpt_ckpt,kpt_cfg,det_ckpt,det_cfg):
+    det_model=init_detector(det_cfg,det_ckpt,device='cuda:0')
+    pose_model = init_pose_model(kpt_cfg,kpt_ckpt,device='cuda:0')
+    dataset = pose_model.cfg.data['test']['type']
+    dataset_info = pose_model.cfg.data['test'].get('dataset_info', None)
+    dataset_info = DatasetInfo(dataset_info)
+    mmdet_results = inference_detector(det_model, imgname)
+    person_results = process_mmdet_results(mmdet_results, 1)
+    
+    return_heatmap = False
+
+    # e.g. use ('backbone', ) to return backbone feature
+    output_layer_names = None
+
+    pose_results, returned_outputs = inference_top_down_pose_model(
+        pose_model,
+        imgname,
+        person_results,
+        bbox_thr=0.3,
+        format='xyxy',
+        dataset=dataset,
+        dataset_info=dataset_info,
+        return_heatmap=True,
+        outputs=output_layer_names)
+
+    
+    out_file = os.path.join('vis_results', f'vis_{osp.basename(imgname)}')
+
+    # show the results
+    vis_pose_result(
+        pose_model,
+        imgname,
+        pose_results,
+        dataset=dataset,
+        dataset_info=dataset_info,
+        kpt_score_thr=0.3,
+        # radius=args.radius,
+        # thickness=,
+        # show=args.show,
+        out_file=out_file)
+    return returned_outputs
+    

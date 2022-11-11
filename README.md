@@ -1,3 +1,12 @@
+## 2D and 3D Monocular Pose-Estimation on AcinoSet
+
+This is the repository of my research into the use of monocular pose-estimation technologies in estimating and tracking the pose of a cheetah.
+As is evident, the repository is forked from [Open MMLab-MMPose](https://github.com/open-mmlab/mmpose/). 
+All code specific to this project can be found in the AnimalPose
+
+
+
+
 <div align="center">
   <img src="resources/mmpose-logo.png" width="450"/>
   <div>&nbsp;</div>
